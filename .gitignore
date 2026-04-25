@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# User data (generated at runtime, not part of the source)
+projects.json
+categories.json
+task_schedule.json
+
+# Development artifacts
+mockup*.html
+.claude/
+AI_AGENT_PLAN.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
