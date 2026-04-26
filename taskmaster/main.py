@@ -1,5 +1,6 @@
 """TaskMaster — FastAPI backend."""
 import json
+import shlex
 import tomllib
 from datetime import datetime
 from pathlib import Path
@@ -206,7 +207,21 @@ async def root():
 @app.get("/api/stats")
 async def stats():
     try:
-        return tw.get_stats()
+        data = tw.get_stats()
+        meta = _store.all()
+        active_statuses = {"active", "on-hold"}
+        data["project_health"] = [
+            p for p in data["project_health"]
+            if meta.get(p["name"], {}).get("status", "active") in active_statuses
+        ]
+        ph = data["project_health"]
+        data["portfolio"] = {
+            "labels":  [f"@{p['name']}" for p in ph],
+            "done":    [p["completed"]              for p in ph],
+            "pending": [p["pending"] - p["overdue"] for p in ph],
+            "overdue": [p["overdue"]                for p in ph],
+        }
+        return data
     except RuntimeError as e:
         raise HTTPException(503, str(e))
 
@@ -222,7 +237,7 @@ async def hot():
 @app.get("/api/tasks")
 async def tasks(filter: str = "status:pending"):
     try:
-        return tw.export(filter.split())
+        return tw.export(shlex.split(filter))
     except RuntimeError as e:
         raise HTTPException(503, str(e))
 
@@ -368,6 +383,15 @@ async def complete_task(task_id: int):
 async def undo_task(task_id: int):
     try:
         tw.undo(task_id)
+        return {"ok": True}
+    except RuntimeError as e:
+        raise HTTPException(503, str(e))
+
+
+@app.patch("/api/tasks/uuid/{uuid}/undo")
+async def undo_task_by_uuid(uuid: str):
+    try:
+        tw.undo_by_uuid(uuid)
         return {"ok": True}
     except RuntimeError as e:
         raise HTTPException(503, str(e))

@@ -128,6 +128,10 @@ def undo(task_id: int) -> None:
     _run(str(task_id), "modify", "status:pending")
 
 
+def undo_by_uuid(uuid: str) -> None:
+    _run(uuid, "modify", "status:pending")
+
+
 # ── Date helpers ───────────────────────────────────────────────
 
 def _parse_date(s: str | None) -> date | None:

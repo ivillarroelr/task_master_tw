@@ -81,8 +81,30 @@ nav.tabs{display:flex;gap:2px}
 .kpi-red{color:var(--red)} .kpi-orange{color:var(--orange)} .kpi-green{color:var(--green)} .kpi-blue{color:var(--blue)} .kpi-dim{color:var(--text-dim)}
 
 /* Dashboard grid */
-.dash-grid{display:grid;grid-template-columns:1fr 400px;gap:16px;margin-bottom:16px}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 400px;gap:16px;margin-bottom:16px}
 .hot-zone{padding:16px}
+/* Completed by day widget */
+.cbd-card{padding:14px;overflow:hidden}
+.cbd-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cbd-day{margin-bottom:6px;border-radius:6px;overflow:hidden;border:1px solid var(--border-soft)}
+.cbd-day-hdr{display:flex;align-items:center;gap:6px;padding:6px 8px;cursor:pointer;user-select:none;background:var(--surface2)}
+.cbd-day-hdr:hover{background:var(--surface3)}
+.cbd-day-label{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--text-dim);flex:1}
+.cbd-day-count{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--green)}
+.cbd-day-tasks{display:none;padding:2px 0 4px}
+.cbd-day.open .cbd-day-tasks{display:block}
+.cbd-proj-hdr{display:flex;align-items:center;gap:5px;padding:4px 8px 4px 12px;cursor:pointer;user-select:none}
+.cbd-proj-hdr:hover{background:var(--surface2)}
+.cbd-proj-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cbd-proj-name{font-size:10px;font-weight:600;color:var(--text-dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cbd-proj-cnt{font-family:var(--font-mono);font-size:10px;color:var(--green)}
+.cbd-proj-arrow{font-size:8px;color:var(--text-muted);transition:transform .15s}
+.cbd-proj.open .cbd-proj-arrow{transform:rotate(90deg)}
+.cbd-proj-tasks{display:none;padding:0 0 2px}
+.cbd-proj.open .cbd-proj-tasks{display:block}
+.cbd-task-item{display:flex;align-items:center;gap:5px;padding:3px 8px 3px 22px;font-size:11px;color:var(--text-dim);cursor:pointer;overflow:hidden}
+.cbd-task-item:hover{background:var(--surface2);color:var(--text)}
+.cbd-task-item::before{content:'✓';color:var(--green);font-size:9px;flex-shrink:0}
 .hot-zone-title{font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .hot-count{font-size:10px;background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);border-radius:10px;padding:1px 8px;font-weight:700}
 .today-count{font-size:10px;background:var(--orange-bg);color:var(--orange);border:1px solid rgba(217,119,6,.25);border-radius:10px;padding:1px 8px;font-weight:700}
@@ -144,6 +166,7 @@ nav.tabs{display:flex;gap:2px}
 .tasks-table td{padding:9px 12px;border-bottom:1px solid var(--border-soft);vertical-align:middle}
 .tasks-table tr:last-child td{border-bottom:none}
 .tasks-table tr:hover td{background:var(--surface2)}
+.tasks-table tr{cursor:pointer}
 .tasks-table tr.row-selected td{background:var(--blue-bg)}
 .td-check{width:36px;text-align:center}
 .td-done-btn{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:transparent;transition:border-color .15s,background .15s,color .15s;padding:0;vertical-align:middle;line-height:1}
@@ -166,6 +189,14 @@ nav.tabs{display:flex;gap:2px}
 
 /* Projects tab */
 .proj-tab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.proj-expand-btn{background:none;border:none;cursor:pointer;padding:4px 7px;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.proj-expand-btn::before{content:'';display:inline-block;width:0;height:0;border-style:solid;border-width:5px 0 5px 9px;border-color:transparent transparent transparent var(--text-dim);transition:transform .18s,border-color .15s}
+.proj-expand-btn:hover::before{border-color:transparent transparent transparent var(--accent)}
+.proj-expand-btn.open::before{transform:rotate(90deg)}
+.proj-acc-row{background:var(--surface2)}
+.proj-acc-inner{padding:6px 12px 10px 44px;display:flex;flex-direction:column;gap:1px}
+.proj-acc-task{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:5px;font-size:12px;cursor:pointer}
+.proj-acc-task:hover{background:var(--surface3)}
 .proj-tab-title{font-size:16px;font-weight:700}
 .proj-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .proj-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:var(--shadow);cursor:pointer;transition:border-color .15s,box-shadow .15s}
@@ -183,8 +214,9 @@ nav.tabs{display:flex;gap:2px}
 .proj-card .act-btn{opacity:1!important}
 /* Project list view */
 .proj-list-table{width:100%;border-collapse:collapse}
-.proj-list-row{border-bottom:1px solid var(--border-soft);transition:background .1s}
+.proj-list-row{border-bottom:1px solid var(--border-soft);transition:background .1s;cursor:pointer}
 .proj-list-row:hover{background:var(--surface2)}
+.proj-list-row:hover .proj-expand-btn::before{border-color:transparent transparent transparent var(--accent)}
 .proj-list-row td{padding:7px 10px;vertical-align:middle;font-size:12px}
 .proj-list-row .act-btn{opacity:1}
 .proj-color-bar{width:4px;padding:0!important}
@@ -334,6 +366,34 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .td-ann-text{font-size:12px;color:var(--text-dim)}
 .td-ann-pomo{color:var(--red);font-weight:600}
 .td-modal-actions{padding:16px 24px;border-top:1px solid var(--border-soft);display:flex;gap:8px;justify-content:flex-end}
+.td-modal-actions .act-btn{opacity:1}
+/* Task detail edit mode */
+.tdm-edit-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:4px}
+.tdm-edit-input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:var(--font-body);font-size:12px;outline:none;transition:border-color .15s}
+.tdm-edit-input:focus{border-color:var(--accent)}
+.tdm-edit-textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:var(--font-body);font-size:13px;font-weight:600;outline:none;resize:vertical;min-height:56px;transition:border-color .15s}
+.tdm-edit-textarea:focus{border-color:var(--accent)}
+/* Projects & Tasks panel */
+.pit-header{display:flex;align-items:center;gap:8px;padding:10px 14px;flex-wrap:wrap}
+.pit-title{font-size:13px;font-weight:700;white-space:nowrap}
+.pit-search-wrap{display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:3px 10px;flex:1;max-width:280px;min-width:120px}
+.pit-search{background:transparent;border:none;outline:none;font-family:var(--font-body);font-size:12px;color:var(--text);width:100%}
+.pit-search::placeholder{color:var(--text-muted)}
+.pit-chip{font-size:11px;padding:3px 9px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:all .15s}
+.pit-chip:hover{background:var(--surface2)}
+.pit-chip.active{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.pit-table{width:100%;border-collapse:collapse}
+.pit-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);background:var(--surface2);border-bottom:1px solid var(--border);padding:6px 10px;text-align:left}
+.pit-table .proj-list-row:last-child td{border-bottom:none}
+/* Rich task rows inside accordion */
+.pit-task-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;border-bottom:1px solid var(--border-soft)}
+.pit-task-row:last-child{border-bottom:none}
+.pit-task-row:hover{background:var(--surface3)}
+.pit-task-desc{flex:1;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.pit-task-desc:hover{color:var(--blue)}
+.pit-task-row .act-btn{opacity:0;transition:opacity .12s}
+.pit-task-row:hover .act-btn{opacity:1}
+.pit-done-text{opacity:.5;text-decoration:line-through}
 
 /* ── Calendar ─────────────────────────────────────────────── */
 .cal-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
@@ -605,7 +665,6 @@ body.zen-active .zen-toggle-btn.active{background:rgba(99,102,241,.4);border-col
   <nav class="tabs">
     <button class="tab-btn active" data-tab="dashboard" data-i18n="tab_dashboard">Dashboard</button>
     <button class="tab-btn" data-tab="tasks" data-i18n="tab_tasks">Tareas</button>
-    <button class="tab-btn" data-tab="projects" data-i18n="tab_projects">Proyectos</button>
     <button class="tab-btn" data-tab="focus" data-i18n="tab_focus">🍅 Focus</button>
     <button class="tab-btn" data-tab="notifications" id="notif-tab-btn" data-i18n="tab_notifications">🔔 Alertas</button>
     <button class="tab-btn" data-tab="calendar" data-i18n="tab_calendar">📅 Calendario</button>
@@ -714,6 +773,11 @@ body.zen-active .zen-toggle-btn.active{background:rgba(99,102,241,.4);border-col
       </div>
     </div>
 
+    <div class="card cbd-card">
+      <div class="cbd-title">✅ Completadas por día</div>
+      <div id="cbd-body"><div style="color:var(--text-muted);font-size:11px">Cargando…</div></div>
+    </div>
+
     <div class="charts-col">
       <div class="card chart-card">
         <div class="chart-title" data-i18n="chart_velocity">Completion velocity — 14 days</div>
@@ -739,37 +803,30 @@ body.zen-active .zen-toggle-btn.active{background:rgba(99,102,241,.4);border-col
 
 <!-- ══ TASKS ════════════════════════════════════════════════ -->
 <section class="tab-content" id="tab-tasks">
-  <div class="filter-bar">
-    <span style="color:var(--text-muted);font-size:14px">🔍</span>
-    <input class="filter-search" id="task-search" data-i18n-placeholder="search_ph" placeholder="Search tasks…" type="text">
-    <div class="filter-sep"></div>
-    <button class="filter-chip active" data-filter="status.not:deleted" data-i18n="filter_all">All</button>
-    <button class="filter-chip" data-filter="status:pending" data-i18n="filter_pending">Pending</button>
-    <button class="filter-chip" data-filter="status:pending due.before:today" data-i18n="filter_overdue">Overdue</button>
-    <button class="filter-chip" data-filter="status:completed" data-i18n="filter_completed">Completed</button>
-    <button class="filter-chip" data-filter="status:deleted" data-i18n="filter_deleted">Deleted</button>
-    <button id="btn-purge" style="display:none;font-size:11px;padding:4px 10px;border-radius:16px;border:1px solid var(--red-border);background:var(--red-bg);color:var(--red);cursor:pointer;white-space:nowrap" onclick="purgeDeleted()" data-i18n="btn_purge">🗑 Purgar</button>
-    <div class="filter-sep"></div>
-    <button class="add-task-btn" id="btn-new-task" data-i18n="btn_new_task" onclick="openNewTaskModal()">+ New task</button>
-  </div>
-  <div class="tasks-table-wrap">
-    <table class="tasks-table">
-      <thead>
-        <tr>
-          <th class="td-check"></th>
-          <th class="td-id">ID</th>
-          <th data-i18n="col_description">Description</th>
-          <th class="td-proj" data-i18n="col_project">Project</th>
-          <th class="td-pri" data-i18n="col_priority">Priority</th>
-          <th class="td-due" data-i18n="col_due">Due</th>
-          <th class="td-urg" data-i18n="col_urgency">Urgency</th>
-          <th class="td-act"></th>
-        </tr>
-      </thead>
-      <tbody id="tasks-tbody">
-        <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted)">Loading…</td></tr>
-      </tbody>
-    </table>
+  <div class="card" id="pit-wrap">
+    <!-- Header -->
+    <div class="pit-header">
+      <span class="pit-title">Proyectos y Tareas</span>
+      <span class="badge b-gray" id="pit-count" style="font-size:11px">0</span>
+      <div class="pit-search-wrap">
+        <span style="color:var(--text-muted);font-size:13px;flex-shrink:0">🔍</span>
+        <input class="pit-search" id="pit-search" placeholder="Buscar tareas…" type="text" autocomplete="off">
+      </div>
+      <button class="pit-chip active" id="pit-chip-pending" data-pf="status:pending" onclick="setPitFilter(this)">Pendientes</button>
+      <button class="pit-chip" id="pit-chip-all" data-pf="status.not:deleted" onclick="setPitFilter(this)">Todas</button>
+      <button class="pit-chip" id="pit-chip-overdue" data-pf="status:pending due.before:today" onclick="setPitFilter(this)">Vencidas</button>
+      <button class="pit-chip" id="pit-chip-done" data-pf="status:completed" onclick="setPitFilter(this)">Hechas</button>
+      <div style="width:1px;height:18px;background:var(--border);flex-shrink:0"></div>
+      <button class="add-task-btn" style="font-size:11px;padding:5px 12px" onclick="openNewTaskModal()">+ Tarea</button>
+      <button class="act-btn" style="opacity:1" onclick="openProjectModal()">+ Proyecto</button>
+      <button class="act-btn" style="opacity:1" onclick="openCatModal()">+ Categoría</button>
+      <button id="pit-archived-toggle" class="act-btn" style="opacity:1" onclick="toggleShowArchivedInTasks()" title="Mostrar archivados">📦</button>
+      <button onclick="togglePitSection()" id="pit-collapse-btn" style="background:transparent;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;padding:2px 4px;line-height:1" title="Colapsar">▾</button>
+    </div>
+    <!-- Project + task accordion list -->
+    <div id="pit-body" style="border-top:1px solid var(--border-soft)">
+      <div style="color:var(--text-muted);font-size:12px;padding:14px 16px">Cargando proyectos…</div>
+    </div>
   </div>
 </section>
 
@@ -782,6 +839,7 @@ body.zen-active .zen-toggle-btn.active{background:rgba(99,102,241,.4);border-col
         <button id="proj-view-cards" class="active" onclick="setProjectView('cards')" data-i18n-title="tt_proj_cards" title="Vista tarjetas">⊞</button>
         <button id="proj-view-list" onclick="setProjectView('list')" data-i18n-title="tt_proj_list" title="Vista lista">≡</button>
       </div>
+      <button id="proj-archived-toggle" class="add-task-btn" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)" onclick="toggleShowArchived()" data-i18n="proj_show_archived">📦 Archivados</button>
       <button class="add-task-btn" style="background:var(--surface2);color:var(--text-dim);border:1px solid var(--border)" onclick="openCatModal()" data-i18n="btn_categories">🏷 Categorías</button>
       <button class="add-task-btn" onclick="openProjectModal()" data-i18n="btn_new_project">+ New project</button>
     </div>
@@ -831,6 +889,11 @@ body.zen-active .zen-toggle-btn.active{background:rgba(99,102,241,.4);border-col
         </div>
         <div class="ft-notes-label" data-i18n="session_notes">📝 Notas de sesión</div>
         <textarea class="ft-notes" id="focus-notes" data-i18n-placeholder="session_notes_ph" placeholder="Escribe notas mientras trabajas…"></textarea>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <button id="focus-save-note-btn" onclick="saveFocusNote()"
+            style="padding:5px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-body)">💾 Guardar nota en tarea</button>
+          <span id="focus-note-feedback" style="font-size:11px;color:var(--green);display:none">✓ Guardado</span>
+        </div>
       </div>
     </div>
     <div class="focus-sidebar">
@@ -1126,7 +1189,8 @@ body.zen-active .zen-toggle-btn.active{background:rgba(99,102,241,.4);border-col
       <div class="td-modal-title" id="tdm-title">—</div>
       <button class="td-modal-close" onclick="closeTaskDetail()">✕</button>
     </div>
-    <div class="td-modal-body">
+    <!-- VIEW mode body -->
+    <div class="td-modal-body" id="tdm-view-body">
       <div class="td-field-row" id="tdm-fields"></div>
       <div id="tdm-tags" style="margin-bottom:16px;display:flex;gap:4px;flex-wrap:wrap"></div>
       <div id="tdm-annotations-wrap">
@@ -1157,6 +1221,37 @@ body.zen-active .zen-toggle-btn.active{background:rgba(99,102,241,.4);border-col
           <button class="tdm-sched-clear" onclick="clearTaskScheduleFromModal()"><span data-i18n="cal_clear_sched">Quitar</span></button>
         </div>
       </div>
+    </div>
+    <!-- EDIT mode body -->
+    <div id="tdm-edit-body" style="display:none;padding:20px 24px">
+      <div style="margin-bottom:12px">
+        <div class="tdm-edit-label">Descripción</div>
+        <textarea id="tdm-ef-desc" class="tdm-edit-textarea" rows="2"></textarea>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+        <div style="flex:1;min-width:130px">
+          <div class="tdm-edit-label">Proyecto</div>
+          <select id="tdm-ef-proj" class="tdm-edit-input"></select>
+        </div>
+        <div style="flex:1;min-width:120px">
+          <div class="tdm-edit-label">Prioridad</div>
+          <select id="tdm-ef-pri" class="tdm-edit-input">
+            <option value="">— sin prioridad</option>
+            <option value="H">🔴 Alta</option>
+            <option value="M">🟡 Media</option>
+            <option value="L">🟢 Baja</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:130px">
+          <div class="tdm-edit-label">Fecha límite</div>
+          <input type="date" id="tdm-ef-due" class="tdm-edit-input">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div class="tdm-edit-label">Tags (separados por espacio, sin #)</div>
+        <input type="text" id="tdm-ef-tags" class="tdm-edit-input" placeholder="tag1 tag2 tag3">
+      </div>
+      <div id="tdm-ef-error" style="display:none;color:var(--red);font-size:11px;font-family:var(--font-mono);padding:6px 10px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:6px;margin-bottom:8px"></div>
     </div>
     <div class="td-modal-actions" id="tdm-actions"></div>
   </div>
@@ -1253,6 +1348,9 @@ const I18N = {
     btn_categories:'🏷 Categorías', btn_new_project:'+ Nuevo proyecto',
     proj_pending:'pendientes', proj_overdue:'vencidas', proj_done:'listas', proj_progress:'avance',
     proj_view:'Ver tareas', proj_edit:'Editar', proj_delete:'Eliminar',
+    proj_archive:'📦 Archivar', proj_show_archived:'📦 Archivados', proj_no_tasks:'Sin tareas.',
+    confirm_archive_proj:'¿Archivar «{name}»? Las tareas quedan intactas.',
+    confirm_archive_proj_title:'Archivar proyecto',
     proj_view_cards:'Vista tarjetas', proj_view_list:'Vista lista',
     no_category:'Sin categoría',
     tt_proj_cards:'Vista tarjetas', tt_proj_list:'Vista lista',
@@ -1413,6 +1511,9 @@ const I18N = {
     btn_categories:'🏷 Categories', btn_new_project:'+ New project',
     proj_pending:'pending', proj_overdue:'overdue', proj_done:'done', proj_progress:'progress',
     proj_view:'View tasks', proj_edit:'Edit', proj_delete:'Delete',
+    proj_archive:'📦 Archive', proj_show_archived:'📦 Archived', proj_no_tasks:'No tasks.',
+    confirm_archive_proj:'Archive «{name}»? Tasks will remain untouched.',
+    confirm_archive_proj_title:'Archive project',
     proj_view_cards:'Card view', proj_view_list:'List view',
     no_category:'No category',
     tt_proj_cards:'Card view', tt_proj_list:'List view',
@@ -1576,7 +1677,7 @@ function applyLang() {
     renderDashCharts(currentStats);
   }
   const active = document.querySelector('.tab-btn.active')?.dataset.tab;
-  if (active === 'tasks' && _lastTasks) renderTasksTable(_lastTasks);
+  if (active === 'tasks' && _lastProjectsFull) renderProjectsInTasks(_lastProjectsFull);
   if (active === 'projects' && _lastProjectsFull) { renderCategoryMetrics(_lastProjectsFull); renderProjectCards(_lastProjectsFull); }
   if (active === 'notifications') renderNotificationTab();
   // Re-apply static text in dynamic areas
@@ -1656,6 +1757,12 @@ let sessionHistory = JSON.parse(localStorage.getItem('tm-sessions') || '[]');
 let _lastTasks = null;
 let _lastHot = null;
 let _lastProjectsFull = null;
+let _showArchived = false;
+let _expandedProjects = new Set();
+let _tdmCurrentTask = null;
+let _pitCollapsed = localStorage.getItem('pit-collapsed') === '1';
+let _pitTaskFilter = localStorage.getItem('pit-filter') || 'status:pending';
+let _pitSearchTimer = null;
 
 /* ══ HELPERS ══════════════════════════════════════════════ */
 const css  = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -1728,8 +1835,10 @@ function formatDueCell(dueStr) {
 /* ══ DATA LOADING ════════════════════════════════════════ */
 async function loadDashboard() {
   try {
-    const [stats, hot] = await Promise.all([
-      api('/api/stats'), api('/api/hot')
+    const cutoff = new Date(Date.now() - 5*86400000).toISOString().slice(0,10).replace(/-/g,'');
+    const [stats, hot, recentDone] = await Promise.all([
+      api('/api/stats'), api('/api/hot'),
+      api(`/api/tasks?filter=${encodeURIComponent('status:completed end.after:' + cutoff + 'T000000Z')}`),
     ]);
     currentStats = stats;
     colorMap = {};
@@ -1738,6 +1847,7 @@ async function loadDashboard() {
     renderKPIs(stats);
     _lastHot = hot;
     renderHotZone(hot);
+    renderCompletedByDay(recentDone);
     renderDashCharts(stats);
     renderProjectHealth(stats.project_health);
     renderFocusQueue(hot);
@@ -1771,8 +1881,7 @@ async function loadReports() {
 async function refresh() {
   await loadDashboard();
   const active = document.querySelector('.tab-btn.active')?.dataset.tab;
-  if (active === 'tasks')   await loadTasks(currentFilter());
-  if (active === 'projects') await loadProjects();
+  if (active === 'tasks' || active === 'projects') await loadProjects();
 }
 
 function currentFilter() {
@@ -1842,6 +1951,75 @@ function renderHotZone(tasks) {
   if (over.length)    { c.appendChild(secLabel(t('section_overdue')));  over.forEach(t2 => c.appendChild(makeCard(t2))); }
   if (today.length)   { c.appendChild(secLabel(t('section_today')));    today.forEach(t2 => c.appendChild(makeCard(t2))); }
   if (highPri.length) { c.appendChild(secLabel(t('section_hipri')));    highPri.forEach(t2 => c.appendChild(makeCard(t2))); }
+}
+
+/* ══ COMPLETED BY DAY ════════════════════════════════════ */
+function renderCompletedByDay(tasks) {
+  const el = document.getElementById('cbd-body');
+  if (!el) return;
+  if (!tasks?.length) {
+    el.innerHTML = `<div style="color:var(--text-muted);font-size:11px;padding:8px 0">Sin tareas completadas en los últimos 5 días.</div>`;
+    return;
+  }
+  // Build ordered day slots (5 days, most recent last)
+  const byDay = new Map();
+  const today = new Date();
+  for (let i = 4; i >= 0; i--) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const key = d.toISOString().slice(0,10).replace(/-/g,'');
+    byDay.set(key, { date: d, tasks: [] });
+  }
+  tasks.forEach(tk => {
+    if (!tk.end) return;
+    const key = tk.end.slice(0,8);
+    if (byDay.has(key)) byDay.get(key).tasks.push(tk);
+  });
+
+  const todayKey = today.toISOString().slice(0,10).replace(/-/g,'');
+
+  el.innerHTML = [...byDay.entries()].map(([key, {date, tasks: ts}]) => {
+    const isToday = key === todayKey;
+    const label   = isToday ? 'Hoy' : date.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'});
+
+    // Group tasks by project within this day
+    const projMap = new Map();
+    ts.forEach(tk => {
+      const p = tk.project || '';
+      if (!projMap.has(p)) projMap.set(p, []);
+      projMap.get(p).push(tk);
+    });
+    // Sort: named projects first (alphabetically), then no-project
+    const projGroups = [...projMap.entries()].sort((a, b) => {
+      if (!a[0] && b[0]) return 1;
+      if (a[0] && !b[0]) return -1;
+      return a[0].localeCompare(b[0]);
+    });
+
+    const projHtml = projGroups.map(([proj, tks]) => {
+      const color  = proj ? projectColor(proj) : 'var(--text-muted)';
+      const pLabel = proj ? `@${proj}` : 'Sin proyecto';
+      const items  = tks.map(tk =>
+        `<div class="cbd-task-item" onclick="openTaskDetail(${tk.id})" title="${esc(tk.description)}">${esc(tk.description.length>32?tk.description.slice(0,32)+'…':tk.description)}</div>`
+      ).join('');
+      return `<div class="cbd-proj open">
+        <div class="cbd-proj-hdr" onclick="this.closest('.cbd-proj').classList.toggle('open')">
+          <div class="cbd-proj-dot" style="background:${color}"></div>
+          <span class="cbd-proj-name">${esc(pLabel)}</span>
+          <span class="cbd-proj-cnt">${tks.length}</span>
+          <span class="cbd-proj-arrow">▶</span>
+        </div>
+        <div class="cbd-proj-tasks">${items}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="cbd-day${ts.length>0&&isToday?' open':''}">
+      <div class="cbd-day-hdr" onclick="this.closest('.cbd-day').classList.toggle('open')">
+        <span class="cbd-day-label">${label}</span>
+        <span class="cbd-day-count">${ts.length}</span>
+      </div>
+      <div class="cbd-day-tasks">${ts.length ? projHtml : '<div style="padding:4px 8px;font-size:10px;color:var(--text-muted)">—</div>'}</div>
+    </div>`;
+  }).join('');
 }
 
 function secLabel(text) {
@@ -2003,21 +2181,21 @@ function renderTasksTable(tasks) {
     const col      = projectColor(proj);
     const isDone   = task.status === 'completed';
     const checkCell = isDone
-      ? `<td class="td-check"><button class="td-done-btn done" title="${t('act_undo')}" onclick="confirmUndoTask(${task.id})">✓</button></td>`
+      ? `<td class="td-check"><button class="td-done-btn done" title="${t('act_undo')}" onclick="confirmUndoTaskByUuid('${esc(task.uuid||'')}',${task.id})">✓</button></td>`
       : `<td class="td-check"><button class="td-done-btn" title="${t('act_done_btn')}" onclick="confirmDoneTask(${task.id})">✓</button></td>`;
     const actBtns = isDone
       ? `<button class="act-btn" onclick="openTaskDetail(${task.id})">${t('act_view')}</button>
-         <button class="act-btn" style="color:var(--orange)" onclick="confirmUndoTask(${task.id})">${t('act_undo')}</button>
+         <button class="act-btn" style="color:var(--orange)" onclick="confirmUndoTaskByUuid('${esc(task.uuid||'')}',${task.id})">${t('act_undo')}</button>
          <button class="act-btn" style="color:var(--red)" onclick="deleteTask(${task.id})">${t('act_delete')}</button>`
       : `<button class="act-btn" onclick="toggleEdit(${task.id})">${t('act_edit')}</button>
          <button class="act-btn" onclick="openTaskDetail(${task.id})">${t('act_view')}</button>
          <button class="act-btn" onclick="pinFocusTask(${JSON.stringify(task).replace(/"/g,'&quot;')})">${t('act_pin')}</button>
          <button class="act-btn" style="color:var(--red)" onclick="deleteTask(${task.id})">${t('act_delete')}</button>`;
     return `
-      <tr data-id="${task.id}">
+      <tr data-id="${task.id}" onclick="openTaskDetailRow(event,${task.id})">
         ${checkCell}
         <td class="td-id">${task.id}</td>
-        <td class="td-desc" title="${esc(task.description)}" onclick="openTaskDetail(${task.id})">${esc(task.description)}</td>
+        <td class="td-desc" title="${esc(task.description)}">${esc(task.description)}</td>
         <td class="td-proj">${proj?`<span class="badge" style="background:${col}22;color:${col};border:1px solid ${col}66">@${esc(proj)}</span>`:''}</td>
         <td class="td-pri"><span class="badge ${priCls}">!${task.priority||'—'}</span></td>
         <td class="td-due" style="${due.style}">${due.label}</td>
@@ -2061,19 +2239,21 @@ function setProjectView(mode) {
 }
 
 function _projListRowHtml(p) {
-  const accent = p.color || projectColor(p.name);
-  const nm  = esc(p.name);
-  const hc  = p.health==='critical'?'var(--red)':p.health==='warning'?'var(--orange)':'var(--green)';
-  const hl  = p.health==='critical'?'●':p.health==='warning'?'●':'●';
-  const st  = p.status || 'active';
-  const catBadge = p.category
-    ? `<span class="badge b-gray" style="font-size:10px">${esc(p.category)}</span>` : '';
-  const stBadge = `<span class="badge ${ST_BADGE[st]||'b-gray'}" style="font-size:10px">${ST_LABEL[st]||st}</span>`;
-  const barW = p.pct;
-  return `<tr class="proj-list-row">
+  const accent  = p.color || projectColor(p.name);
+  const nm      = esc(p.name);
+  const hc      = p.health==='critical'?'var(--red)':p.health==='warning'?'var(--orange)':'var(--green)';
+  const st      = p.status || 'active';
+  const catBadge = p.category ? `<span class="badge b-gray" style="font-size:10px">${esc(p.category)}</span>` : '';
+  const stBadge  = `<span class="badge ${ST_BADGE[st]||'b-gray'}" style="font-size:10px">${ST_LABEL[st]||st}</span>`;
+  const barW    = p.pct;
+  const isOpen  = _expandedProjects.has(p.name);
+  return `<tr class="proj-list-row" data-proj="${nm}" onclick="projRowClick(event,this)">
+    <td style="padding:0 6px;width:24px">
+      <button class="proj-expand-btn${isOpen?' open':''}" title="Ver tareas" onclick="event.stopPropagation();toggleProjectAccordion(this)"></button>
+    </td>
     <td class="proj-color-bar" style="background:${accent}"></td>
     <td style="min-width:160px">
-      <span style="font-weight:700;font-size:12px">@${nm}</span>
+      <span style="font-weight:700;font-size:12px;cursor:pointer">@${nm}</span>
       ${p.description ? `<div style="font-size:10px;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.description)}</div>` : ''}
     </td>
     <td>${catBadge}</td>
@@ -2087,12 +2267,19 @@ function _projListRowHtml(p) {
         <span style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted)">${barW}%</span>
       </div>
     </td>
-    <td><span style="color:${hc};font-size:13px" title="${p.health}">${hl}</span></td>
+    <td><span style="color:${hc};font-size:13px" title="${p.health}">●</span></td>
     <td style="white-space:nowrap">
+      <button class="act-btn" style="color:var(--blue)" onclick="event.stopPropagation();openNewTaskModal('${nm}')">+ Tarea</button>
       <button class="act-btn" onclick="viewProject('${nm}')">${t('proj_view')}</button>
       <button class="act-btn" onclick="openProjectByName('${nm}')">${t('proj_edit')}</button>
+      <button class="act-btn" onclick="archiveProject('${nm}')">${t('proj_archive')}</button>
       <button class="act-btn" style="color:var(--red)" onclick="deleteProject('${nm}')">${t('proj_delete')}</button>
     </td>
+  </tr>
+  <tr class="proj-acc-row" style="display:${isOpen?'table-row':'none'}">
+    <td colspan="11"><div class="proj-acc-inner">
+      <div style="color:var(--text-muted);font-size:11px">Cargando…</div>
+    </div></td>
   </tr>`;
 }
 
@@ -2100,9 +2287,10 @@ async function loadProjects() {
   try {
     const projects = await api('/api/projects');
     _lastProjectsFull = projects;
-    _cachedProjects = projects.map(p => p.name).sort();
+    _cachedProjects = projects.filter(p => (p.status||'active') !== 'archived').map(p => p.name).sort();
     renderCategoryMetrics(projects);
     renderProjectCards(projects);
+    renderProjectsInTasks(projects);
   } catch(e) { showBanner(e.message); }
 }
 
@@ -2143,6 +2331,7 @@ function _projCardHtml(p, i) {
     <div style="display:flex;gap:6px;padding-top:10px;border-top:1px solid var(--border-soft)">
       <button class="act-btn" style="flex:1" onclick="viewProject('${nm}')">${t('proj_view')}</button>
       <button class="act-btn" onclick="openProjectByName('${nm}')">${t('proj_edit')}</button>
+      <button class="act-btn" onclick="archiveProject('${nm}')">${t('proj_archive')}</button>
       <button class="act-btn" style="color:var(--red)" onclick="deleteProject('${nm}')">${t('proj_delete')}</button>
     </div>
   </div>`;
@@ -2160,16 +2349,19 @@ function renderProjectCards(projects) {
     return;
   }
 
-  // Sort: by category then name
-  const sorted = [...projects].sort((a, b) => {
-    const ca = a.category || '', cb = b.category || '';
-    if (ca !== cb) return ca ? (cb ? ca.localeCompare(cb) : -1) : 1;
-    return a.name.localeCompare(b.name);
-  });
+  // Sort: by category then name; filter archived unless _showArchived
+  const sorted = [...projects]
+    .filter(p => _showArchived || (p.status||'active') !== 'archived')
+    .sort((a, b) => {
+      const ca = a.category || '', cb = b.category || '';
+      if (ca !== cb) return ca ? (cb ? ca.localeCompare(cb) : -1) : 1;
+      return a.name.localeCompare(b.name);
+    });
 
   if (_projView === 'list') {
     g.style.display = 'block';
     const colHdr = `<tr style="border-bottom:2px solid var(--border)">
+      <th style="width:20px;padding:0"></th>
       <th style="width:4px;padding:0"></th>
       <th style="text-align:left;padding:6px 10px;font-size:11px;color:var(--text-muted);font-weight:600">Proyecto</th>
       <th style="text-align:left;padding:6px 10px;font-size:11px;color:var(--text-muted);font-weight:600">Cat.</th>
@@ -2182,6 +2374,15 @@ function renderProjectCards(projects) {
       <th style="padding:6px 10px;font-size:11px;color:var(--text-muted);font-weight:600"></th>
     </tr>`;
     g.innerHTML = `<table class="proj-list-table"><thead>${colHdr}</thead><tbody>${sorted.map(_projListRowHtml).join('')}</tbody></table>`;
+    if (_expandedProjects.size > 0) {
+      g.querySelectorAll('tr.proj-list-row[data-proj]').forEach(row => {
+        const name = row.dataset.proj;
+        if (_expandedProjects.has(name)) {
+          const inner = row.nextElementSibling?.querySelector('.proj-acc-inner');
+          if (inner) _loadAccordionTasks(inner, name);
+        }
+      });
+    }
   } else {
     g.style.display = '';
     // Group by category; uncategorised goes last
@@ -2257,9 +2458,23 @@ async function undoTask(id) {
   } catch(e) { showBanner(e.message); }
 }
 
+function confirmUndoTaskByUuid(uuid, id) {
+  confirmDialog(t('confirm_undo_task', {id: id||uuid.slice(0,8)}), () => undoTaskByUuid(uuid),
+    { title: t('confirm_undo_title'), okLabel: t('confirm_undo_ok') });
+}
+
+async function undoTaskByUuid(uuid) {
+  try {
+    await api(`/api/tasks/uuid/${encodeURIComponent(uuid)}/undo`, {method:'PATCH'});
+    await refresh();
+  } catch(e) { showBanner(e.message); }
+}
+
 async function openTaskDetail(id) {
   const modal = document.getElementById('task-detail-modal');
   modal.style.display = 'flex';
+  document.getElementById('tdm-view-body').style.display = 'block';
+  document.getElementById('tdm-edit-body').style.display = 'none';
   document.getElementById('tdm-id').textContent = `#${id}`;
   document.getElementById('tdm-title').textContent = '…';
   document.getElementById('tdm-fields').innerHTML = '';
@@ -2268,6 +2483,7 @@ async function openTaskDetail(id) {
   document.getElementById('tdm-actions').innerHTML = '';
   try {
     const task = await api(`/api/tasks/${id}`);
+    _tdmCurrentTask = task;
     _renderTaskDetail(task);
   } catch(e) {
     document.getElementById('tdm-title').textContent = e.message;
@@ -2338,18 +2554,220 @@ function _renderTaskDetail(task) {
   const isDone = task.status === 'completed';
   document.getElementById('tdm-actions').innerHTML = `
     ${!isDone ? `<button class="act-btn" style="color:var(--green);font-weight:600" onclick="closeTaskDetail();confirmDoneTask(${task.id})">${t('tdm_done')}</button>` : ''}
-    ${!isDone ? `<button class="act-btn" onclick="closeTaskDetail();toggleEdit(${task.id})">${t('tdm_edit')}</button>` : ''}
-    ${isDone ? `<button class="act-btn" style="color:var(--orange)" onclick="closeTaskDetail();confirmUndoTask(${task.id})">${t('tdm_undo')}</button>` : ''}
+    ${!isDone ? `<button class="add-task-btn" style="font-size:12px;padding:6px 16px" onclick="openTaskDetailEdit(${task.id})">✏ ${t('tdm_edit')}</button>` : ''}
+    ${isDone ? `<button class="act-btn" style="color:var(--orange)" onclick="closeTaskDetail();confirmUndoTaskByUuid('${task.uuid||''}',${task.id})">${t('tdm_undo')}</button>` : ''}
     <button class="act-btn" style="color:var(--red)" onclick="closeTaskDetail();deleteTask(${task.id})">${t('tdm_delete')}</button>
     <button class="add-task-btn" style="font-size:12px;padding:7px 16px" onclick="closeTaskDetail()">${t('tdm_close')}</button>
   `;
 }
 
+function openTaskDetailEdit(id) {
+  const task = _tdmCurrentTask;
+  if (!task || task.id !== id) return;
+  document.getElementById('tdm-view-body').style.display = 'none';
+  document.getElementById('tdm-edit-body').style.display = 'block';
+  document.getElementById('tdm-ef-desc').value = task.description || '';
+  const projSel = document.getElementById('tdm-ef-proj');
+  projSel.innerHTML = `<option value="">— sin proyecto —</option>` +
+    _cachedProjects.map(pn => `<option value="${esc(pn)}"${pn===(task.project||'')?'  selected':''}>@${esc(pn)}</option>`).join('');
+  projSel.value = task.project || '';
+  document.getElementById('tdm-ef-pri').value = task.priority || '';
+  document.getElementById('tdm-ef-due').value = task.due ? task.due.slice(0,8).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3') : '';
+  document.getElementById('tdm-ef-tags').value = (task.tags||[]).join(' ');
+  document.getElementById('tdm-ef-error').style.display = 'none';
+  document.getElementById('tdm-actions').innerHTML = `
+    <button class="act-btn" onclick="closeTaskDetailEdit(${id})">Cancelar</button>
+    <button class="add-task-btn" style="font-size:12px;padding:7px 16px" onclick="saveTaskDetailEdit(${id})">💾 Guardar cambios</button>
+  `;
+  document.getElementById('tdm-ef-desc').focus();
+}
+
+function closeTaskDetailEdit(id) {
+  document.getElementById('tdm-view-body').style.display = 'block';
+  document.getElementById('tdm-edit-body').style.display = 'none';
+  if (_tdmCurrentTask) _renderTaskDetail(_tdmCurrentTask);
+}
+
+async function saveTaskDetailEdit(id) {
+  const desc = document.getElementById('tdm-ef-desc').value.trim();
+  if (!desc) {
+    const err = document.getElementById('tdm-ef-error');
+    err.textContent = 'La descripción no puede estar vacía.';
+    err.style.display = 'block';
+    return;
+  }
+  const body = {
+    description: desc,
+    project: document.getElementById('tdm-ef-proj').value || '',
+    priority: document.getElementById('tdm-ef-pri').value || '',
+    due: document.getElementById('tdm-ef-due').value || '',
+    tags: document.getElementById('tdm-ef-tags').value.trim().split(/\s+/).filter(Boolean),
+  };
+  try {
+    await api(`/api/tasks/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    document.getElementById('tdm-view-body').style.display = 'block';
+    document.getElementById('tdm-edit-body').style.display = 'none';
+    const task = await api(`/api/tasks/${id}`);
+    _tdmCurrentTask = task;
+    _renderTaskDetail(task);
+    refresh();
+  } catch(e) {
+    const err = document.getElementById('tdm-ef-error');
+    err.textContent = e.message;
+    err.style.display = 'block';
+  }
+}
+
+async function openTaskDetailDirectEdit(id) {
+  const modal = document.getElementById('task-detail-modal');
+  modal.style.display = 'flex';
+  document.getElementById('tdm-view-body').style.display = 'none';
+  document.getElementById('tdm-edit-body').style.display = 'none';
+  document.getElementById('tdm-id').textContent = `#${id}`;
+  document.getElementById('tdm-title').textContent = '…';
+  document.getElementById('tdm-actions').innerHTML = `<span style="color:var(--text-muted);font-size:12px">Cargando…</span>`;
+  try {
+    const task = await api(`/api/tasks/${id}`);
+    _tdmCurrentTask = task;
+    openTaskDetailEdit(id);
+  } catch(e) {
+    document.getElementById('tdm-title').textContent = e.message;
+    document.getElementById('tdm-view-body').style.display = 'block';
+    document.getElementById('tdm-actions').innerHTML = `<button class="add-task-btn" onclick="closeTaskDetail()">Cerrar</button>`;
+  }
+}
+
 function closeTaskDetail() {
   document.getElementById('task-detail-modal').style.display = 'none';
+  document.getElementById('tdm-view-body').style.display = 'block';
+  document.getElementById('tdm-edit-body').style.display = 'none';
+  _tdmCurrentTask = null;
 }
 
 /* ══ FOCUS / POMODORO ════════════════════════════════════ */
+function openTaskDetailRow(event, id) {
+  if (event.target.closest('button,a,.td-done-btn')) return;
+  openTaskDetail(id);
+}
+
+/* ══ PROJECTS IN TASKS VIEW ══════════════════════════════ */
+function togglePitSection() {
+  _pitCollapsed = !_pitCollapsed;
+  localStorage.setItem('pit-collapsed', _pitCollapsed ? '1' : '0');
+  const body = document.getElementById('pit-body');
+  const btn  = document.getElementById('pit-collapse-btn');
+  if (body) body.style.display = _pitCollapsed ? 'none' : 'block';
+  if (btn)  btn.textContent = _pitCollapsed ? '▸' : '▾';
+}
+
+function toggleShowArchivedInTasks() {
+  _showArchived = !_showArchived;
+  const btn = document.getElementById('pit-archived-toggle');
+  if (btn) {
+    btn.style.color      = _showArchived ? 'var(--accent)' : '';
+    btn.style.borderColor = _showArchived ? 'var(--accent)' : '';
+  }
+  if (_lastProjectsFull) renderProjectsInTasks(_lastProjectsFull);
+}
+
+async function setPitFilter(btnEl) {
+  _pitTaskFilter = btnEl.dataset.pf || 'status:pending';
+  localStorage.setItem('pit-filter', _pitTaskFilter);
+  document.querySelectorAll('.pit-chip').forEach(c => c.classList.toggle('active', c === btnEl));
+  // Reload all open accordions with new filter
+  for (const name of _expandedProjects) {
+    const rows = document.querySelectorAll(`#pit-body tr.proj-list-row[data-proj="${CSS.escape(name)}"]`);
+    rows.forEach(row => {
+      const inner = row.nextElementSibling?.querySelector('.proj-acc-inner');
+      if (inner) _loadAccordionTasks(inner, name);
+    });
+  }
+}
+
+function _filterPitSearch(term) {
+  const lc = term.toLowerCase();
+  // Filter project rows
+  document.querySelectorAll('#pit-body tr.proj-list-row[data-proj]').forEach(row => {
+    const name    = (row.dataset.proj||'').toLowerCase();
+    const visible = !lc || name.includes(lc);
+    row.style.display = visible ? '' : 'none';
+    const accRow = row.nextElementSibling;
+    if (accRow?.classList.contains('proj-acc-row') && !visible) accRow.style.display = 'none';
+  });
+  // Filter task rows inside open accordions
+  document.querySelectorAll('#pit-body .pit-task-row[data-desc]').forEach(taskRow => {
+    const desc = taskRow.dataset.desc || '';
+    taskRow.style.display = !lc || desc.includes(lc) ? '' : 'none';
+  });
+}
+
+function _initPitSearch() {
+  const inp = document.getElementById('pit-search');
+  if (!inp) return;
+  inp.value = '';
+  inp.oninput = () => {
+    clearTimeout(_pitSearchTimer);
+    _pitSearchTimer = setTimeout(() => _filterPitSearch(inp.value.trim()), 200);
+  };
+}
+
+function _syncPitFilterChips() {
+  document.querySelectorAll('.pit-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.pf === _pitTaskFilter);
+  });
+}
+
+function renderProjectsInTasks(projects) {
+  const body = document.getElementById('pit-body');
+  if (!body) return;
+
+  body.style.display = _pitCollapsed ? 'none' : 'block';
+  const collapseBtn = document.getElementById('pit-collapse-btn');
+  if (collapseBtn) collapseBtn.textContent = _pitCollapsed ? '▸' : '▾';
+
+  _syncPitFilterChips();
+
+  const sorted = [...(projects||[])]
+    .filter(p => _showArchived || (p.status||'active') !== 'archived')
+    .sort((a,b) => a.name.localeCompare(b.name));
+
+  const countEl = document.getElementById('pit-count');
+  if (countEl) countEl.textContent = sorted.length;
+
+  if (!sorted.length) {
+    body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;padding:14px 16px">${t('no_projects')}</div>`;
+    _initPitSearch();
+    return;
+  }
+
+  const colHdr = `<tr style="border-bottom:1px solid var(--border)">
+    <th style="width:20px;padding:0"></th>
+    <th style="width:4px;padding:0"></th>
+    <th style="text-align:left;padding:6px 10px">Proyecto</th>
+    <th style="text-align:left;padding:6px 10px">Cat.</th>
+    <th style="text-align:left;padding:6px 10px">Estado</th>
+    <th style="text-align:right;padding:6px 10px">${t('proj_pending')}</th>
+    <th style="text-align:right;padding:6px 10px">${t('proj_overdue')}</th>
+    <th style="text-align:right;padding:6px 10px">${t('proj_done')}</th>
+    <th style="padding:6px 10px">${t('proj_progress')}</th>
+    <th style="padding:6px 10px"></th>
+    <th style="padding:6px 10px"></th>
+  </tr>`;
+  body.innerHTML = `<table class="pit-table"><thead>${colHdr}</thead><tbody>${sorted.map(_projListRowHtml).join('')}</tbody></table>`;
+
+  // Restore expanded accordions
+  if (_expandedProjects.size > 0) {
+    body.querySelectorAll('tr.proj-list-row[data-proj]').forEach(row => {
+      const name = row.dataset.proj;
+      if (_expandedProjects.has(name)) {
+        const inner = row.nextElementSibling?.querySelector('.proj-acc-inner');
+        if (inner) _loadAccordionTasks(inner, name);
+      }
+    });
+  }
+  _initPitSearch();
+}
+
 function pinFocusTask(task) {
   if (typeof task === 'string') task = JSON.parse(task);
   focusTask = task;
@@ -2380,8 +2798,12 @@ function renderFocusTask() {
           </div>
         </div>
       </div>
-      <button onclick="unpinFocusTask()" data-i18n-title="tt_unpin" title="Quitar del focus"
-        style="flex-shrink:0;background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 9px;cursor:pointer;color:var(--text-muted);font-size:11px;font-family:var(--font-body)">✕ unpin</button>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        <button onclick="completeFocusTask()" title="Marcar como hecha"
+          style="background:var(--green-bg);border:1px solid var(--green);border-radius:6px;padding:4px 9px;cursor:pointer;color:var(--green);font-size:11px;font-family:var(--font-body);font-weight:600;white-space:nowrap">✓ Completar</button>
+        <button onclick="unpinFocusTask()" data-i18n-title="tt_unpin" title="Quitar del focus"
+          style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 9px;cursor:pointer;color:var(--text-muted);font-size:11px;font-family:var(--font-body)">✕ unpin</button>
+      </div>
     </div>`;
 }
 
@@ -2389,6 +2811,34 @@ function unpinFocusTask() {
   focusTask = null;
   localStorage.removeItem('tm-focus-task');
   renderFocusTask();
+}
+
+function completeFocusTask() {
+  if (!focusTask?.id) return;
+  confirmDoneTask(focusTask.id);
+  unpinFocusTask();
+}
+
+async function saveFocusNote() {
+  const text = document.getElementById('focus-notes').value.trim();
+  if (!text) return;
+  if (!focusTask?.id) {
+    showBanner('Fija una tarea primero para guardar la nota.');
+    return;
+  }
+  try {
+    await api(`/api/tasks/${focusTask.id}/annotate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    document.getElementById('focus-notes').value = '';
+    const fb = document.getElementById('focus-note-feedback');
+    fb.style.display = 'inline';
+    setTimeout(() => { fb.style.display = 'none'; }, 2500);
+  } catch(e) {
+    showBanner(e.message);
+  }
 }
 
 function renderFocusQueue(tasks) {
@@ -2472,11 +2922,13 @@ function _pomoSessionComplete() {
     const tentativePos = (pomoState.cyclePos % pomoConfig.cyclesBeforeLong) + 1;
     if (tentativePos >= pomoConfig.cyclesBeforeLong) {
       // Full cycle → long break
+      _playPomoSound('cycle');
       pomoState.cyclePos = pomoConfig.cyclesBeforeLong; // all dots filled
       pomoState.mode  = 'long';
       pomoState.secs  = pomoConfig.longMins * 60;
       pomoState.total = pomoConfig.longMins * 60;
     } else {
+      _playPomoSound('work');
       pomoState.cyclePos = tentativePos;
       pomoState.mode  = 'short';
       pomoState.secs  = pomoConfig.shortMins * 60;
@@ -2484,6 +2936,7 @@ function _pomoSessionComplete() {
     }
   } else {
     // Break ended → back to work
+    _playPomoSound('break');
     if (pomoState.mode === 'long') pomoState.cyclePos = 0; // reset cycle
     pomoState.mode  = 'work';
     pomoState.secs  = pomoConfig.workMins * 60;
@@ -2525,7 +2978,8 @@ document.getElementById('pomoReset').addEventListener('click', () => {
 });
 
 document.getElementById('pomoSkip').addEventListener('click', () => {
-  if (pomoState.secs > 0) { pomoState.secs = 1; }  // let the interval trigger completion
+  clearInterval(pomoInterval);
+  _pomoSessionComplete();
 });
 
 function renderSessionHistory() {
@@ -2727,8 +3181,8 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.classList.add('active');
     document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
     const t=btn.dataset.tab;
-    if(t==='tasks')         await loadTasks(currentFilter());
-    if(t==='projects')      loadProjects();
+    if(t==='tasks')    await loadProjects();
+    if(t==='projects') loadProjects();
     if(t==='notifications') { markAllNotifsRead(); renderNotificationTab(); _syncNotifLeadCheckboxes(); }
     if(t==='reports'){
       if(currentStats) renderMiniChartsGrid(currentStats.project_health);
@@ -2789,13 +3243,21 @@ setInterval(()=>{ if(document.visibilityState==='visible') refresh(); }, 30000);
 setInterval(updateRefreshLabel, 5000);
 
 /* ══ PROJECT CRUD ════════════════════════════════════════ */
-function viewProject(name) {
+async function viewProject(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.querySelector('[data-tab="tasks"]').classList.add('active');
   document.getElementById('tab-tasks').classList.add('active');
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  loadTasks(`project:${name} status:pending`);
+  if (_lastProjectsFull) renderProjectsInTasks(_lastProjectsFull);
+  else await loadProjects();
+  // Expand the target project accordion
+  if (!_expandedProjects.has(name)) {
+    const row = document.querySelector(`#pit-body tr.proj-list-row[data-proj="${CSS.escape(name)}"]`);
+    if (row) {
+      const btn = row.querySelector('.proj-expand-btn');
+      if (btn) toggleProjectAccordion(btn);
+    }
+  }
 }
 
 function deleteProject(name) {
@@ -2803,9 +3265,121 @@ function deleteProject(name) {
     try {
       await api(`/api/projects/${encodeURIComponent(name)}`, {method:'DELETE'});
       showQaFeedback(`✓ @${name}`, true);
+      _expandedProjects.delete(name);
       await loadProjects();
     } catch(e) { showBanner(e.message); }
   }, { title: t('confirm_del_proj_title'), okLabel: t('delete_btn'), danger: true });
+}
+
+function archiveProject(name) {
+  confirmDialog(t('confirm_archive_proj', {name}), async () => {
+    try {
+      const p = _lastProjectsFull?.find(proj => proj.name === name) || {};
+      await api(`/api/projects/${encodeURIComponent(name)}`, {
+        method: 'PATCH',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          name, status: 'archived',
+          description: p.description || null, color: p.color || null,
+          priority: p.priority || null, due: p.due || null,
+          notes: p.notes || null, category: p.category || null,
+        }),
+      });
+      showQaFeedback(`📦 @${name}`, true);
+      _expandedProjects.delete(name);
+      await loadProjects();
+    } catch(e) { showBanner(e.message); }
+  }, { title: t('confirm_archive_proj_title'), okLabel: t('proj_archive') });
+}
+
+function toggleShowArchived() {
+  _showArchived = !_showArchived;
+  const btn = document.getElementById('proj-archived-toggle');
+  if (btn) {
+    btn.style.color = _showArchived ? 'var(--accent)' : 'var(--text-muted)';
+    btn.style.borderColor = _showArchived ? 'var(--accent)' : 'var(--border)';
+  }
+  if (_lastProjectsFull) renderProjectCards(_lastProjectsFull);
+}
+
+async function _loadAccordionTasks(inner, name) {
+  inner.innerHTML = `<div style="color:var(--text-muted);font-size:11px;padding:6px 0">Cargando…</div>`;
+  try {
+    const proj   = (_lastProjectsFull||[]).find(p=>p.name===name);
+    const safeProj = name.includes(' ') ? `"${name}"` : name;
+    const filter = `project:${safeProj} ${_pitTaskFilter||'status:pending'}`;
+    const tasks  = await api(`/api/tasks?filter=${encodeURIComponent(filter)}`);
+
+    // Stats bar — negates proj-acc-inner padding to span full width
+    let statsHtml = '';
+    if (proj) {
+      const accent = proj.color || projectColor(proj.name);
+      statsHtml = `<div style="margin:-6px -12px 4px -44px;padding:7px 14px;background:var(--surface2);border-bottom:1px solid var(--border-soft);display:flex;gap:16px;font-size:11px;flex-wrap:wrap;align-items:center">
+        <span style="font-family:var(--font-mono);color:var(--text-dim)">${proj.pending} <span style="color:var(--text-muted)">pend.</span></span>
+        <span style="font-family:var(--font-mono);color:var(--red)">${proj.overdue} <span style="color:var(--text-muted)">venc.</span></span>
+        <span style="font-family:var(--font-mono);color:var(--green)">${proj.completed} <span style="color:var(--text-muted)">hechas</span></span>
+        <span style="display:flex;align-items:center;gap:4px">
+          <div style="width:56px;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden">
+            <div style="width:${proj.pct}%;height:100%;background:${accent};border-radius:3px"></div>
+          </div>
+          <span style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted)">${proj.pct}%</span>
+        </span>
+      </div>`;
+    }
+
+    if (!tasks.length) {
+      inner.innerHTML = statsHtml + `<div style="color:var(--text-muted);font-size:11px;padding:8px 4px">${t('proj_no_tasks')}</div>`;
+      return;
+    }
+
+    const taskRows = tasks.map(tk => {
+      const isDone    = tk.status === 'completed';
+      const priCls    = tk.priority==='H'?'b-pri-h':tk.priority==='M'?'b-pri-m':'b-gray';
+      const due       = tk.due ? formatDueCell(tk.due.substring(0,8)) : null;
+      const urgCss    = (tk.urgency||0)>10?'color:var(--red)':(tk.urgency||0)>6?'color:var(--orange)':'color:var(--text-muted)';
+      const endDate   = isDone && tk.end ? parseTWDate(tk.end)?.toLocaleDateString() : null;
+      const doneBtn   = isDone
+        ? `<button class="td-done-btn done" onclick="event.stopPropagation();confirmUndoTaskByUuid('${esc(tk.uuid||'')}',${tk.id})" title="Deshacer">✓</button>`
+        : `<button class="td-done-btn" onclick="event.stopPropagation();confirmDoneTask(${tk.id})" title="Marcar hecho">✓</button>`;
+      return `<div class="pit-task-row${isDone?' pit-task-done':''}" data-desc="${esc((tk.description||'').toLowerCase())}">
+        ${doneBtn}
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);min-width:32px">#${tk.id}</span>
+        <span class="pit-task-desc${isDone?' pit-done-text':''}" onclick="openTaskDetail(${tk.id})">${esc(tk.description)}</span>
+        ${tk.priority?`<span class="badge ${priCls}" style="font-size:10px">!${tk.priority}</span>`:''}
+        ${endDate?`<span style="font-family:var(--font-mono);font-size:10px;color:var(--green);flex-shrink:0">✓ ${endDate}</span>`:due?`<span style="font-family:var(--font-mono);font-size:11px;${due.style};flex-shrink:0">${due.label}</span>`:''}
+        ${!isDone?`<span style="font-family:var(--font-mono);font-size:10px;${urgCss};min-width:28px;text-align:right">${(tk.urgency||0).toFixed(1)}</span>`:''}
+        ${!isDone?`<button class="act-btn" onclick="event.stopPropagation();openTaskDetailDirectEdit(${tk.id})" style="font-size:10px;padding:2px 7px;color:var(--blue)">✏ Editar</button>`:''}
+        <button class="act-btn" style="font-size:10px;padding:2px 7px;color:var(--red)" onclick="event.stopPropagation();deleteTask(${tk.id})">🗑</button>
+      </div>`;
+    }).join('');
+    inner.innerHTML = statsHtml + taskRows;
+  } catch(e) {
+    inner.innerHTML = `<div style="color:var(--red);font-size:11px">${esc(e.message)}</div>`;
+  }
+}
+
+function projRowClick(e, row) {
+  if (e.target.closest('button,a')) return;
+  const btn = row.querySelector('.proj-expand-btn');
+  if (btn) toggleProjectAccordion(btn);
+}
+
+async function toggleProjectAccordion(btn) {
+  const projRow = btn.closest('tr.proj-list-row');
+  const accRow  = projRow?.nextElementSibling;
+  if (!accRow || !accRow.classList.contains('proj-acc-row')) return;
+  const name = projRow.dataset.proj;
+  const inner = accRow.querySelector('.proj-acc-inner');
+  if (_expandedProjects.has(name)) {
+    _expandedProjects.delete(name);
+    accRow.style.display = 'none';
+    btn.classList.remove('open');
+  } else {
+    _expandedProjects.add(name);
+    accRow.style.display = 'table-row';
+    btn.classList.add('open');
+    if (inner) await _loadAccordionTasks(inner, name);
+  }
 }
 
 /* ══ PROJECT MODAL ════════════════════════════════════════ */
@@ -3061,11 +3635,14 @@ document.getElementById('cat-modal').addEventListener('keydown', e => {
 });
 
 /* ══ NEW TASK MODAL ═══════════════════════════════════════ */
-function openNewTaskModal() {
+function openNewTaskModal(preselectedProj) {
   const projSel = document.getElementById('m-proj');
-  projSel.innerHTML = '<option value="">— sin proyecto —</option>' +
-    _cachedProjects.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
-  projSel.value = '';
+  const activeProjs = _lastProjectsFull
+    ? _lastProjectsFull.filter(p => (p.status||'active') !== 'archived').map(p => p.name).sort()
+    : _cachedProjects;
+  projSel.innerHTML = `<option value="">${t('ntm_no_project')}</option>` +
+    activeProjs.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  projSel.value = preselectedProj || '';
   document.getElementById('m-desc').value = '';
   document.getElementById('m-due').value  = '';
   document.getElementById('m-pri').value  = '';
@@ -3096,7 +3673,7 @@ async function submitNewTask() {
   const schedEnd   = document.getElementById('m-sched-end')?.value   || '';
 
   let raw = desc;
-  if (proj) raw += ` @${proj}`;
+  if (proj) raw += proj.includes(' ') ? ` @"${proj}"` : ` @${proj}`;
   if (pri === 'H') raw += ' !h';
   else if (pri === 'M') raw += ' !m';
   else if (pri === 'L') raw += ' !l';
@@ -3114,11 +3691,30 @@ async function submitNewTask() {
     }
     closeNewTaskModal();
     showQaFeedback('✓ Tarea agregada', true);
-    await refresh();
     if (schedStart || schedEnd) {
+      await refresh();
       document.querySelector('[data-tab="calendar"]')?.click();
     } else {
-      document.querySelector('[data-tab="tasks"]').click();
+      const active = document.querySelector('.tab-btn.active')?.dataset.tab;
+      if (active !== 'tasks') {
+        await refresh();
+        document.querySelector('[data-tab="tasks"]').click();
+      } else {
+        await refresh();
+        // Auto-expand the assigned project to show the new task immediately
+        if (proj) {
+          const row = document.querySelector(`#pit-body tr.proj-list-row[data-proj="${CSS.escape(proj)}"]`);
+          if (row) {
+            if (!_expandedProjects.has(proj)) {
+              const btn = row.querySelector('.proj-expand-btn');
+              if (btn) await toggleProjectAccordion(btn);
+            } else {
+              const inner = row.nextElementSibling?.querySelector('.proj-acc-inner');
+              if (inner) await _loadAccordionTasks(inner, proj);
+            }
+          }
+        }
+      }
     }
   } catch(err) {
     errEl.textContent = err.message;
@@ -3697,8 +4293,11 @@ function _blockHtml(b) {
 function calSlotClick(dateStr, hour) {
   const projSel = document.getElementById('m-proj');
   if (projSel) {
-    projSel.innerHTML = `<option value="">— sin proyecto —</option>` +
-      _cachedProjects.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    const _ap = _lastProjectsFull
+      ? _lastProjectsFull.filter(p => (p.status||'active') !== 'archived').map(p => p.name).sort()
+      : _cachedProjects;
+    projSel.innerHTML = `<option value="">${t('ntm_no_project')}</option>` +
+      _ap.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
     projSel.value = '';
   }
   const dueEl = document.getElementById('m-due');
@@ -3849,6 +4448,38 @@ function _playNotifChime() {
       osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sine'; osc.frequency.value = freq;
       gain.gain.setValueAtTime(0.22, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + dur + 0.05);
+    });
+  } catch(e) {}
+}
+
+// type: 'work' = sesión de estudio terminó → pausa
+//       'break' = pausa terminó → volver a trabajar
+//       'cycle' = ciclo mayor completo → pausa larga
+function _playPomoSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    let notes, wave;
+    if (type === 'cycle') {
+      // Celebratorio — 4 notas ascendentes
+      notes = [[523, 0, 0.35], [659, 0.15, 0.4], [784, 0.3, 0.45], [1047, 0.48, 0.7]];
+      wave  = 'triangle';
+    } else if (type === 'break') {
+      // Pausa terminada — dos notas descendentes, tonos suaves
+      notes = [[880, 0, 0.25], [660, 0.15, 0.35]];
+      wave  = 'sine';
+    } else {
+      // Sesión de trabajo terminada — tres notas ascendentes suaves
+      notes = [[880, 0, 0.22], [1100, 0.13, 0.28], [1320, 0.26, 0.38]];
+      wave  = 'sine';
+    }
+    notes.forEach(([freq, delay, dur]) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = wave; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.2, ctx.currentTime + delay);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
       osc.start(ctx.currentTime + delay);
       osc.stop(ctx.currentTime + delay + dur + 0.05);
