@@ -7,7 +7,9 @@ from datetime import date, datetime, timezone
 from icalendar import Calendar
 from pathlib import Path
 
-FEEDS_FILE = Path(__file__).parent.parent / "ical_feeds.json"
+_DATA_DIR = Path.home() / ".taskmaster"
+_DATA_DIR.mkdir(parents=True, exist_ok=True)
+FEEDS_FILE = _DATA_DIR / "ical_feeds.json"
 
 MEET_PATTERNS = [
     r'https?://meet\.google\.com/\S+',

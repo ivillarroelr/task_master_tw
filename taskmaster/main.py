@@ -1,6 +1,7 @@
 """TaskMaster — FastAPI backend."""
 import json
 import shlex
+import shutil
 import tomllib
 from datetime import datetime
 from pathlib import Path
@@ -31,17 +32,28 @@ tw.BACKEND    = _cfg.get("taskwarrior", {}).get("backend", "wsl")
 tw.WSL_DISTRO = _cfg.get("taskwarrior", {}).get("wsl_distro", "")
 tw._build_cmd()
 
+# ── User data directory (stable across reinstalls / any launch cwd) ──
+# Stores projects.json, categories.json, task_schedule.json.
+# Falls back to cfg_dir for backwards compat if a data override is set.
+_data_dir = Path(_cfg.get("data", {}).get("dir", "")).expanduser() if _cfg.get("data", {}).get("dir") else Path.home() / ".taskmaster"
+_data_dir.mkdir(parents=True, exist_ok=True)
+
+# One-time migration: copy existing JSON files from the old cfg_dir location.
+for _fname in ("projects.json", "categories.json", "task_schedule.json"):
+    _src, _dst = _cfg_dir / _fname, _data_dir / _fname
+    if _src.exists() and not _dst.exists() and _src != _dst:
+        shutil.copy2(_src, _dst)
+
 STATIC = Path(__file__).parent / "static"
 app = FastAPI(title="TaskMaster", version="0.1.0")
 
 
 # ── Project metadata store ──────────────────────────────────────
 class ProjectStore:
-    """Persists project metadata (description, status, colour, etc.)
-    alongside tw.toml so the data survives reinstalls."""
+    """Persists project metadata (description, status, colour, etc.)."""
 
     def __init__(self) -> None:
-        self.path = _cfg_dir / "projects.json"
+        self.path = _data_dir / "projects.json"
 
     def _data(self) -> dict:
         if self.path.exists():
@@ -83,7 +95,7 @@ _store = ProjectStore()
 # ── Category metadata store ──────────────────────────────────────
 class CategoryStore:
     def __init__(self) -> None:
-        self.path = _cfg_dir / "categories.json"
+        self.path = _data_dir / "categories.json"
 
     def _data(self) -> list:
         if self.path.exists():
@@ -131,7 +143,7 @@ class ScheduleStore:
     """Stores per-task scheduled start/end (ISO local datetime strings)."""
 
     def __init__(self) -> None:
-        self.path = _cfg_dir / "task_schedule.json"
+        self.path = _data_dir / "task_schedule.json"
 
     def _data(self) -> dict:
         if self.path.exists():

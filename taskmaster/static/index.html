@@ -821,7 +821,6 @@ body.zen-active .zen-toggle-btn.active{background:rgba(99,102,241,.4);border-col
       <button class="act-btn" style="opacity:1" onclick="openProjectModal()">+ Proyecto</button>
       <button class="act-btn" style="opacity:1" onclick="openCatModal()">+ Categoría</button>
       <button id="pit-archived-toggle" class="act-btn" style="opacity:1" onclick="toggleShowArchivedInTasks()" title="Mostrar archivados">📦</button>
-      <button onclick="togglePitSection()" id="pit-collapse-btn" style="background:transparent;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;padding:2px 4px;line-height:1" title="Colapsar">▾</button>
     </div>
     <!-- Project + task accordion list -->
     <div id="pit-body" style="border-top:1px solid var(--border-soft)">
@@ -1760,7 +1759,6 @@ let _lastProjectsFull = null;
 let _showArchived = false;
 let _expandedProjects = new Set();
 let _tdmCurrentTask = null;
-let _pitCollapsed = localStorage.getItem('pit-collapsed') === '1';
 let _pitTaskFilter = localStorage.getItem('pit-filter') || 'status:pending';
 let _pitSearchTimer = null;
 
@@ -1836,13 +1834,17 @@ function formatDueCell(dueStr) {
 async function loadDashboard() {
   try {
     const cutoff = new Date(Date.now() - 5*86400000).toISOString().slice(0,10).replace(/-/g,'');
-    const [stats, hot, recentDone] = await Promise.all([
+    const [stats, hot, recentDone, projects, categories] = await Promise.all([
       api('/api/stats'), api('/api/hot'),
       api(`/api/tasks?filter=${encodeURIComponent('status:completed end.after:' + cutoff + 'T000000Z')}`),
+      api('/api/projects'),
+      api('/api/categories'),
     ]);
     currentStats = stats;
     colorMap = {};
-    _cachedProjects = (stats.project_health || []).map(p => p.name).sort();
+    _lastProjectsFull = projects;
+    _cachedCategories = categories;
+    _cachedProjects = projects.filter(p => (p.status||'active') !== 'archived').map(p => p.name).sort();
     showBanner(null); setDot(true);
     renderKPIs(stats);
     _lastHot = hot;
@@ -2050,13 +2052,21 @@ function makeCard(task) {
   const urg   = (task.urgency||0).toFixed(1);
   const urgCls = task.urgency > 10 ? 'urg-crit' : task.urgency > 6 ? 'urg-high' : '';
 
+  const projMeta  = proj ? (_lastProjectsFull||[]).find(p => p.name === proj) : null;
+  const category  = projMeta?.category || '';
+  const catObj    = category ? (_cachedCategories||[]).find(c => c.name === category) : null;
+  const catColor  = catObj?.color || 'var(--text-muted)';
+  const catBadge  = category
+    ? `<span class="badge" style="background:${catColor}22;color:${catColor};border:1px solid ${catColor}55;font-size:9px">#${esc(category)}</span>`
+    : '';
+
   div.innerHTML = `
     <div class="proj-stripe" style="background:${color}"></div>
     <div class="task-card-body">
       <div class="task-desc">${esc(task.description)}</div>
       <div class="task-meta">
         ${proj ? `<span class="badge b-blue">@${esc(proj)}</span>` : ''}
-        ${tags}${due}
+        ${catBadge}${tags}${due}
         ${task.priority && pri ? `<span class="badge ${pri}">!${task.priority}</span>` : ''}
       </div>
     </div>
@@ -2236,6 +2246,29 @@ function setProjectView(mode) {
   document.getElementById('proj-view-cards').classList.toggle('active', mode === 'cards');
   document.getElementById('proj-view-list').classList.toggle('active', mode === 'list');
   if (_lastProjectsFull) renderProjectCards(_lastProjectsFull);
+}
+
+const _NO_PROJ = '\x00no-project'; // sentinel for tasks with no project
+
+function _noProjectRowHtml() {
+  const isOpen = _expandedProjects.has(_NO_PROJ);
+  const safeKey = esc(_NO_PROJ);
+  return `<tr class="proj-list-row" data-proj="${safeKey}" onclick="projRowClick(event,this)" style="opacity:.7">
+    <td style="padding:0 6px;width:24px">
+      <button class="proj-expand-btn${isOpen?' open':''}" title="Ver tareas sin proyecto" onclick="event.stopPropagation();toggleProjectAccordion(this)"></button>
+    </td>
+    <td class="proj-color-bar" style="background:var(--text-muted)"></td>
+    <td style="min-width:160px">
+      <span style="font-weight:600;font-size:12px;color:var(--text-muted);font-style:italic">Sin proyecto</span>
+    </td>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td></td>
+  </tr>
+  <tr class="proj-acc-row" style="display:${isOpen?'table-row':'none'}">
+    <td colspan="11"><div class="proj-acc-inner">
+      <div style="color:var(--text-muted);font-size:11px">Cargando…</div>
+    </div></td>
+  </tr>`;
 }
 
 function _projListRowHtml(p) {
@@ -2651,14 +2684,6 @@ function openTaskDetailRow(event, id) {
 }
 
 /* ══ PROJECTS IN TASKS VIEW ══════════════════════════════ */
-function togglePitSection() {
-  _pitCollapsed = !_pitCollapsed;
-  localStorage.setItem('pit-collapsed', _pitCollapsed ? '1' : '0');
-  const body = document.getElementById('pit-body');
-  const btn  = document.getElementById('pit-collapse-btn');
-  if (body) body.style.display = _pitCollapsed ? 'none' : 'block';
-  if (btn)  btn.textContent = _pitCollapsed ? '▸' : '▾';
-}
 
 function toggleShowArchivedInTasks() {
   _showArchived = !_showArchived;
@@ -2721,10 +2746,7 @@ function renderProjectsInTasks(projects) {
   const body = document.getElementById('pit-body');
   if (!body) return;
 
-  body.style.display = _pitCollapsed ? 'none' : 'block';
-  const collapseBtn = document.getElementById('pit-collapse-btn');
-  if (collapseBtn) collapseBtn.textContent = _pitCollapsed ? '▸' : '▾';
-
+  body.style.display = 'block';
   _syncPitFilterChips();
 
   const sorted = [...(projects||[])]
@@ -2753,9 +2775,10 @@ function renderProjectsInTasks(projects) {
     <th style="padding:6px 10px"></th>
     <th style="padding:6px 10px"></th>
   </tr>`;
-  body.innerHTML = `<table class="pit-table"><thead>${colHdr}</thead><tbody>${sorted.map(_projListRowHtml).join('')}</tbody></table>`;
+  const noProj = _noProjectRowHtml();
+  body.innerHTML = `<table class="pit-table"><thead>${colHdr}</thead><tbody>${sorted.map(_projListRowHtml).join('')}${noProj}</tbody></table>`;
 
-  // Restore expanded accordions
+  // Restore expanded accordions (named projects + "sin proyecto" sentinel)
   if (_expandedProjects.size > 0) {
     body.querySelectorAll('tr.proj-list-row[data-proj]').forEach(row => {
       const name = row.dataset.proj;
@@ -3305,9 +3328,13 @@ function toggleShowArchived() {
 async function _loadAccordionTasks(inner, name) {
   inner.innerHTML = `<div style="color:var(--text-muted);font-size:11px;padding:6px 0">Cargando…</div>`;
   try {
-    const proj   = (_lastProjectsFull||[]).find(p=>p.name===name);
+    const isNoProj = name === _NO_PROJ;
+    const proj   = isNoProj ? null : (_lastProjectsFull||[]).find(p=>p.name===name);
     const safeProj = name.includes(' ') ? `"${name}"` : name;
-    const filter = `project:${safeProj} ${_pitTaskFilter||'status:pending'}`;
+    const baseFilter = _pitTaskFilter || 'status:pending';
+    const filter = isNoProj
+      ? `project.none: ${baseFilter}`
+      : `project:${safeProj} ${baseFilter}`;
     const tasks  = await api(`/api/tasks?filter=${encodeURIComponent(filter)}`);
 
     // Stats bar — negates proj-acc-inner padding to span full width
@@ -3893,16 +3920,14 @@ function dismissAllNotifs() {
 /* ══ CATEGORY METRICS ════════════════════════════════════ */
 function renderCategoryMetrics(projects) {
   const wrap = document.getElementById('cat-metrics-wrap');
-  if (!wrap) return;
-  // Only show if at least one project has a category
-  const withCat = projects.filter(p => p.category);
-  if (!withCat.length || !_cachedCategories.length) { wrap.style.display = 'none'; return; }
+  if (!wrap || !projects?.length) { if (wrap) wrap.style.display = 'none'; return; }
 
+  const UNCATEGORIZED = '\x00'; // sentinel key for "Sin categoría"
   const groups = {};
   projects.forEach(p => {
-    if (!p.category) return;
-    if (!groups[p.category]) groups[p.category] = { projects: 0, pending: 0, overdue: 0, completed: 0, pct: [] };
-    const g = groups[p.category];
+    const key = p.category || UNCATEGORIZED;
+    if (!groups[key]) groups[key] = { projects: 0, pending: 0, overdue: 0, completed: 0, pct: [] };
+    const g = groups[key];
     g.projects++;
     g.pending   += p.pending;
     g.overdue   += p.overdue;
@@ -3910,20 +3935,28 @@ function renderCategoryMetrics(projects) {
     g.pct.push(p.pct);
   });
 
-  const cards = Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0])).map(([name, g]) => {
-    const catObj = _cachedCategories.find(c => c.name === name);
-    const color  = catObj?.color || 'var(--accent)';
-    const avgPct = g.pct.length ? Math.round(g.pct.reduce((a, b) => a + b, 0) / g.pct.length) : 0;
-    return `<div class="cat-metric-card" style="border-top:3px solid ${color}">
-      <div class="cmc-name"><div style="width:10px;height:10px;border-radius:50%;background:${color}"></div>${esc(name)}</div>
-      <div class="cmc-stats">
-        <div class="cmc-stat"><strong>${g.projects}</strong> ${t('cat_projects')}</div>
-        <div class="cmc-stat"><strong>${avgPct}%</strong> ${t('cat_avg_done')}</div>
-        <div class="cmc-stat"><strong>${g.pending}</strong> ${t('cat_pending')}</div>
-        <div class="cmc-stat ${g.overdue ? 'ph-overdue' : ''}"><strong>${g.overdue}</strong> ${t('cat_overdue')}</div>
-      </div>
-    </div>`;
-  }).join('');
+  const cards = Object.entries(groups)
+    .sort(([a], [b]) => {
+      if (a === UNCATEGORIZED) return 1;  // "Sin categoría" always last
+      if (b === UNCATEGORIZED) return -1;
+      return a.localeCompare(b);
+    })
+    .map(([name, g]) => {
+      const isUncategorized = name === UNCATEGORIZED;
+      const catObj = isUncategorized ? null : _cachedCategories.find(c => c.name === name);
+      const color  = catObj?.color || (isUncategorized ? 'var(--text-muted)' : 'var(--accent)');
+      const label  = isUncategorized ? t('no_category') : name;
+      const avgPct = g.pct.length ? Math.round(g.pct.reduce((a, b) => a + b, 0) / g.pct.length) : 0;
+      return `<div class="cat-metric-card" style="border-top:3px solid ${color}${isUncategorized?';opacity:.7':''}">
+        <div class="cmc-name"><div style="width:10px;height:10px;border-radius:50%;background:${color}"></div>${esc(label)}</div>
+        <div class="cmc-stats">
+          <div class="cmc-stat"><strong>${g.projects}</strong> ${t('cat_projects')}</div>
+          <div class="cmc-stat"><strong>${avgPct}%</strong> ${t('cat_avg_done')}</div>
+          <div class="cmc-stat"><strong>${g.pending}</strong> ${t('cat_pending')}</div>
+          <div class="cmc-stat ${g.overdue ? 'ph-overdue' : ''}"><strong>${g.overdue}</strong> ${t('cat_overdue')}</div>
+        </div>
+      </div>`;
+    }).join('');
 
   wrap.innerHTML = `<div class="cat-metrics-row">${cards}</div>`;
   wrap.style.display = 'block';
